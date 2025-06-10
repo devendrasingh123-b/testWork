@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indexpage</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      #heading {
+        border: 2px solid greenyellow;
+        padding: 10px;
+        background-color: rgb(157, 157, 72);
+        margin-bottom: 20px;
+      }
+
+      #container {
+        display: flex;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+        /* padding: 10px; */
+      }
+
+      #container > div {
+        border: 1px solid red;
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #container > div > img {
+        border-radius: 10px;
+      }
+
+      #input {
+        padding: 10px 15px;
+        width: 300px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+      }
+
+      .green {
+        color: green;
+      }
+
+      .red {
+        color: red;
+      }
+
+      .grey {
+        color: gray;
+      }
+
+      #highlight {
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body onload="getData()">
+    <h1 id="heading">Rick and Morty universe</h1>
+
+    <input type="text" id="input" placeholder=" write name" />
+
+    <h3>Status</h3>
+    <select name="" id="Status">
+      <option value="Alive">Alive</option>
+      <option value="Dead">Dead</option>
+      <option value="unknown">unknown</option>
+    </select>
+
+    <h3>Species</h3>
+    <select name="" id="Species">
+      <option value="Human">Human</option>
+      <option value="Alien">Alien</option>
+      <option value="Robot">Robot</option>
+    </select>
+
+    <button onclick="ref()">Ref</button>
+
+    <div id="container"></div>
+  </body>
+</html>
+
+<script>
+  let maindiv = document.getElementById("container");
+  let mainArr = [];
+
+  function ref() {
+    getData(mainArr);
+    // console.log("hi")
+  }
+
+  //Felter  Species
+
+  let species = document.getElementById("Species");
+  species.addEventListener("change", () => {
+    console.log(species.value);
+
+    let data = mainArr.filter((ele) => {
+      return ele.species === species.value;
+    });
+
+    // console.log(data)
+    showData(data);
+  });
+
+  let status = document.getElementById("Status");
+
+  status.addEventListener("change", () => {
+    // console.log(status.value)
+
+    let data = mainArr.filter((ele) => {
+      return ele.status === status.value;
+    });
+
+    // console.log(data)
+    showData(data);
+  });
+
+  //Search
+  let input = document.getElementById("input");
+  let timer;
+  input.addEventListener("input", (event) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      // console.log(event.target.value)
+      ShowValue(event.target.value);
+    }, 1000);
+  });
+
+  function ShowValue(value) {
+    console.log(value);
+    value = value.toLowerCase();
+
+    let data = mainArr.filter((ele) => {
+      return ele.name.toLowerCase().includes(value);
+    });
+
+    console.log(data);
+    showData(data);
+  }
+
+  async function getData() {
+    let res = await fetch("https://rickandmortyapi.com/api/character");
+    let data = await res.json();
+
+    // console.log(data.results)
+    mainArr = data.results;
+
+    showData(mainArr);
+
+    // console.log(mainArr)
+  }
+
+  function showData(data) {
+    console.log(data);
+
+    maindiv.innerHTML = "";
+
+    data.forEach((ele) => {
+      let child = document.createElement("div");
+
+      // console.log(ele.episode.length)
+      if (ele.episode.length >= 30) {
+        child.id = "highlight";
+      }
+
+      if (ele.status === "Alive") {
+        child.classList = "green";
+      } else if (ele.status === "Dead") {
+        child.classList = "red";
+      } else {
+        child.classList = "gray";
+      }
+
+      child.innerHTML = ` <img src="${ele.image}" alt="">
+<p>Name:${ele.name}</p>
+<p>${ele.location.name}</p>
+<h1>${ele.species}</h1>
+<h5>${ele.status}</h5>
+
+
+
+`;
+
+      maindiv.append(child);
+    });
+  }
+
+  
+
+
+  
+</script>
